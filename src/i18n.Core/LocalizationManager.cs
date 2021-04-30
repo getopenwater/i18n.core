@@ -15,9 +15,6 @@ namespace i18n.Core
     {
         const string CacheKeyPrefix = "TranslationDictionary-";
 
-        static readonly PluralizationRuleDelegate DefaultPluralRule = n => n != 1 ? 1 : 0;
-
-        readonly IList<IPluralRuleProvider> _pluralRuleProviders;
         readonly ITranslationProvider _translationProvider;
         readonly IMemoryCache _cache;
         readonly INuggetReplacer _nuggetReplacer;
@@ -25,17 +22,14 @@ namespace i18n.Core
         /// <summary>
         /// Creates a new instance of <see cref="LocalizationManager"/>.
         /// </summary>
-        /// <param name="pluralRuleProviders">A list of <see cref="IPluralRuleProvider"/>s.</param>
         /// <param name="translationProvider">The <see cref="ITranslationProvider"/>.</param>
         /// <param name="cache">The <see cref="IMemoryCache"/>.</param>
         /// <param name="nuggetReplacer"></param>
         public LocalizationManager(
-            IEnumerable<IPluralRuleProvider> pluralRuleProviders,
             ITranslationProvider translationProvider,
             IMemoryCache cache,
             INuggetReplacer nuggetReplacer)
         {
-            _pluralRuleProviders = pluralRuleProviders.OrderBy(o => o.Order).ToArray();
             _translationProvider = translationProvider;
             _cache = cache;
             _nuggetReplacer = nuggetReplacer;
@@ -53,7 +47,7 @@ namespace i18n.Core
 
             var cachedDictionary = _cache.GetOrCreate(cacheKeyPrefix, k => new Lazy<TranslationDictionary>(() =>
             {
-                var dictionary = new TranslationDictionary(languageTag, DefaultPluralRule);
+                var dictionary = new TranslationDictionary(languageTag);
 
                 if (languageTag != "en")
                     _translationProvider.LoadTranslations(languageTag, dictionary);

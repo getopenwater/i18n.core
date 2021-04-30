@@ -12,11 +12,11 @@ namespace i18n.Core.Abstractions
         /// </summary>
         /// <param name="messageId">The message Id.</param>
         /// <param name="context">The message context.</param>
-        /// <param name="translations">a list of translations</param>
-        public TranslationDictionaryRecord(string messageId, string context, string[] translations)
+        /// <param name="translation">The translation.</param>
+        public TranslationDictionaryRecord(string messageId, string context, string translation)
         {
             Key = GetKey(messageId, context);
-            Translations = translations;
+            Translation = translation;
         }
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace i18n.Core.Abstractions
         public string Key { get; }
 
         /// <summary>
-        /// Gets the translation values.
+        /// Gets the translation.
         /// </summary>
-        public string[] Translations { get; }
+        public string Translation { get; }
 
         /// <summary>
         /// Retrieved the resource key using <paramref name="messageId"/> and <paramref name="context"/>.

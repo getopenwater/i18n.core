@@ -127,42 +127,34 @@ namespace i18n.Core.PortableObject
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
         sealed class DictionaryRecordBuilder
         {
-            readonly List<string> _values;
-            IEnumerable<string> ValidValues => _values.Where(value => !string.IsNullOrEmpty(value));
             PoContext _context;
 
             public string MessageId { get; private set; }
             public string MessageContext { get; private set; }
+            public string Value { get; set; }
 
-            public IEnumerable<string> Values => _values;
-
-            public bool IsValid => !string.IsNullOrEmpty(MessageId) && ValidValues.Any();
+            public bool IsValid => !string.IsNullOrEmpty(MessageId) && !string.IsNullOrEmpty(Value);
             public bool ShouldFlushRecord => IsValid && _context == PoContext.Translation;
-
-            public DictionaryRecordBuilder()
-            {
-                _values = new List<string>();
-            }
-
+            
             public void Set(PoContext context, string text)
             {
                 switch (context)
                 {
                     case PoContext.MessageId:
-                        {
-                            // If the MessageId has been set to an empty string and now gets set again
-                            // before flushing the values should be reset.
-                            if (string.IsNullOrEmpty(MessageId))
-                            {
-                                _values.Clear();
-                            }
+                        MessageId = text;
+                        break;
 
-                            MessageId = text;
-                            break;
-                        }
-                    case PoContext.MessageContext: MessageContext = text; break;
-                    case PoContext.Translation: _values.Add(text); break;
-                    case PoContext.Text: AppendText(text); return; // we don't want to set context to Text
+                    case PoContext.MessageContext:
+                        MessageContext = text;
+                        break;
+
+                    case PoContext.Translation:
+                        Value = text;
+                        break;
+
+                    case PoContext.Text:
+                        AppendText(text);
+                        return; // we don't want to set context to Text
                 }
 
                 _context = context;
@@ -172,13 +164,16 @@ namespace i18n.Core.PortableObject
             {
                 switch (_context)
                 {
-                    case PoContext.MessageId: MessageId += text; break;
-                    case PoContext.MessageContext: MessageContext += text; break;
+                    case PoContext.MessageId:
+                        MessageId += text;
+                        break;
+
+                    case PoContext.MessageContext:
+                        MessageContext += text;
+                        break;
+
                     case PoContext.Translation:
-                        if (_values.Count > 0)
-                        {
-                            _values[^1] += text;
-                        }
+                        Value += text;
                         break;
                 }
             }
@@ -190,11 +185,11 @@ namespace i18n.Core.PortableObject
                     return null;
                 }
 
-                var result = new TranslationDictionaryRecord(MessageId, MessageContext, ValidValues.ToArray());
+                var result = new TranslationDictionaryRecord(MessageId, MessageContext, Value);
 
                 MessageId = null;
                 MessageContext = null;
-                _values.Clear();
+                Value = null;
 
                 return result;
             }
