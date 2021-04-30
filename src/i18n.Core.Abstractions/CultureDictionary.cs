@@ -33,9 +33,10 @@ namespace i18n.Core.Abstractions
         /// <summary>
         /// Gets the localized value.
         /// </summary>
-        /// <param name="key">The resource key.</param>
+        /// <param name="messageId">The message ID.</param>
+        /// <param name="context">The message context (comment).</param>
         /// <returns></returns>
-        public string this[string key] => this[key, null];
+        public string this[string messageId, string context] => this[CultureDictionaryRecord.GetKey(messageId, context), (int?)null];
 
         /// <summary>
         /// Gets the localized value.
