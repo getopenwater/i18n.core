@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using i18n.Core.Abstractions;
 using JetBrains.Annotations;
@@ -74,6 +75,8 @@ namespace i18n.Core.Middleware
 
     public sealed class I18NMiddleware
     {
+        private static readonly Regex LanguageTagPattern = new Regex(@"^\w{2}$", RegexOptions.Compiled);
+
         readonly RequestDelegate _next;
         readonly ILocalizationManager _localizationManager;
         readonly ILogger<I18NMiddleware> _logger;
@@ -134,7 +137,7 @@ namespace i18n.Core.Middleware
             // Force dynamic content type in order reset Content-Length header.
             httpResponseFeature.Headers.ContentLength = null;
 
-            var httpResponseBodyStream = (Stream) responseBodyPooledStream;
+            var httpResponseBodyStream = (Stream)responseBodyPooledStream;
             httpResponseBodyStream.Seek(0, SeekOrigin.Begin);
 
             var contentType = GetRequestContentType(context);
@@ -143,14 +146,15 @@ namespace i18n.Core.Middleware
             if (replaceNuggets)
             {
                 var languageTag = context.Request.Cookies["i18n.langtag"];
-                languageTag = !string.IsNullOrEmpty(languageTag) ? languageTag : "en";
+                if (languageTag == null || !LanguageTagPattern.IsMatch(languageTag))
+                    languageTag = "en";
 
                 var translationDictionary = _localizationManager.GetDictionary(languageTag, !_options.CacheEnabled);
 
                 _logger?.LogDebug($"Request path: {context.Request.Path}. Language tag: {translationDictionary.LanguageTag}. Translations: {translationDictionary.Translations.Count}.");
 
                 var responseBody = await ReadResponseBodyAsStringAsync(httpResponseBodyStream, requestEncoding);
-                
+
                 string responseBodyTranslated;
                 if (webHostEnvironment.IsDevelopment())
                 {
