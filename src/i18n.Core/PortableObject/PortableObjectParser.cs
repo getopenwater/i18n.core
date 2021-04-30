@@ -23,7 +23,7 @@ namespace i18n.Core.PortableObject
         /// Parses a .po file.
         /// </summary>
         /// <param name="reader">The <see cref="TextReader"/>.</param>
-        /// <returns>A list of culture records.</returns>
+        /// <returns>A list of translation dictionary records.</returns>
         public IEnumerable<TranslationDictionaryRecord> Parse(TextReader reader)
         {
             var entryBuilder = new DictionaryRecordBuilder();

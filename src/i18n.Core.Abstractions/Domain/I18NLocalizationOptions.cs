@@ -12,6 +12,7 @@ namespace i18n.Core.Abstractions.Domain
     {
         private const string CommonLocaleResourceDefault = "./bin/Debug/net5.0/AwardsCms.Web.Common.Core.dll";
         private const string LocaleDirectoryDefault = "Locale";
+        private const string LanguageTagCookieNameDefault = "i18n.langtag";
 
         private readonly ISettingsProvider _settingsProvider;
 
@@ -37,6 +38,11 @@ namespace i18n.Core.Abstractions.Domain
             set => _settingsProvider.SetSetting(GetPrefixedString("LocaleDirectory"), value);
         }
 
+        public string LanguageTagCookieName
+        {
+            get => _settingsProvider.GetSetting(GetPrefixedString("LanguageTagCookieName")) ?? LanguageTagCookieNameDefault;
+            set => _settingsProvider.SetSetting(GetPrefixedString("LanguageTagCookieName"), value);
+        }
 
         public I18NLocalizationOptions() : this(new SettingsProvider(Directory.GetCurrentDirectory()))
         {

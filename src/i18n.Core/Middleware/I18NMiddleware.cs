@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using i18n.Core.Abstractions;
+using i18n.Core.Abstractions.Domain;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -77,15 +78,16 @@ namespace i18n.Core.Middleware
     {
         private static readonly Regex LanguageTagPattern = new Regex(@"^\w{2}$", RegexOptions.Compiled);
 
-        readonly RequestDelegate _next;
-        readonly ILocalizationManager _localizationManager;
-        readonly ILogger<I18NMiddleware> _logger;
-        readonly IPooledStreamManager _pooledStreamManager;
-        readonly INuggetReplacer _nuggetReplacer;
-        readonly I18NMiddlewareOptions _options;
+        private readonly RequestDelegate _next;
+        private readonly ILocalizationManager _localizationManager;
+        private readonly ILogger<I18NMiddleware> _logger;
+        private readonly IPooledStreamManager _pooledStreamManager;
+        private readonly INuggetReplacer _nuggetReplacer;
+        private readonly I18NMiddlewareOptions _options;
+        private readonly I18NLocalizationOptions _i18NLocalizationOptions;
 
         public I18NMiddleware(RequestDelegate next, ILocalizationManager localizationManager, IOptions<I18NMiddlewareOptions> middleWareOptions,
-            [CanBeNull] ILogger<I18NMiddleware> logger, IPooledStreamManager pooledStreamManager, INuggetReplacer nuggetReplacer)
+            [CanBeNull] ILogger<I18NMiddleware> logger, IPooledStreamManager pooledStreamManager, INuggetReplacer nuggetReplacer, IOptions<I18NLocalizationOptions> i18NLocalizationOptions)
         {
             _next = next;
             _localizationManager = localizationManager;
@@ -93,6 +95,7 @@ namespace i18n.Core.Middleware
             _pooledStreamManager = pooledStreamManager;
             _nuggetReplacer = nuggetReplacer;
             _options = middleWareOptions.Value;
+            _i18NLocalizationOptions = i18NLocalizationOptions.Value;
         }
 
         // https://dejanstojanovic.net/aspnet/2018/august/minify-aspnet-mvc-core-response-using-custom-middleware-and-pipeline/
@@ -145,7 +148,7 @@ namespace i18n.Core.Middleware
             var replaceNuggets = validContentTypes != null && validContentTypes.Contains(contentType);
             if (replaceNuggets)
             {
-                var languageTag = context.Request.Cookies["i18n.langtag"];
+                var languageTag = context.Request.Cookies[_i18NLocalizationOptions.LanguageTagCookieName];
                 if (languageTag == null || !LanguageTagPattern.IsMatch(languageTag))
                     languageTag = "en";
 
