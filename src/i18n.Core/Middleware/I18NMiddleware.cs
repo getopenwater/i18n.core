@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -14,7 +13,6 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -144,8 +142,10 @@ namespace i18n.Core.Middleware
             var replaceNuggets = validContentTypes != null && validContentTypes.Contains(contentType);
             if (replaceNuggets)
             {
-                var requestCultureInfo = GetRequestCultureInfo(context);
-                var cultureDictionary = _localizationManager.GetDictionary(requestCultureInfo, !_options.CacheEnabled);
+                var languageTag = context.Request.Cookies["i18n.langtag"];
+                languageTag = !string.IsNullOrEmpty(languageTag) ? languageTag : "en";
+
+                var cultureDictionary = _localizationManager.GetDictionary(languageTag, !_options.CacheEnabled);
 
                 _logger?.LogDebug($"Request path: {context.Request.Path}. Culture name: {cultureDictionary.CultureName}. Translations: {cultureDictionary.Translations.Count}.");
 
@@ -184,25 +184,6 @@ namespace i18n.Core.Middleware
         static string GetRequestContentType(HttpContext context)
         {
             return context.Response.ContentType?.ToLower()?.Split(';', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-        }
-
-        CultureInfo GetRequestCultureInfo(HttpContext context)
-        {
-            var requestCultureFeature = context.Features.Get<IRequestCultureFeature>();
-
-            CultureInfo requestCultureInfo;
-            if (requestCultureFeature == null)
-            {
-                _logger?.LogWarning(
-                    $"{nameof(IRequestCultureFeature)} is not configured. {nameof(CultureInfo.DefaultThreadCurrentCulture)} will be used as fallback culture.");
-                requestCultureInfo = CultureInfo.DefaultThreadCurrentCulture;
-            }
-            else
-            {
-                requestCultureInfo = requestCultureFeature.RequestCulture.Culture;
-            }
-
-            return requestCultureInfo;
         }
 
         static async Task<string> ReadResponseBodyAsStringAsync(Stream stream, Encoding encoding)

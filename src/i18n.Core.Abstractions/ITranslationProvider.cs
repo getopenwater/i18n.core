@@ -8,10 +8,10 @@ namespace i18n.Core.Abstractions
     public interface ITranslationProvider
     {
         /// <summary>
-        /// Loads translations from a certain source for a specific culture.
+        /// Loads translations from a certain source for a specific language tag.
         /// </summary>
-        /// <param name="cultureName">The culture name.</param>
+        /// <param name="languageTag">The language tag.</param>
         /// <param name="dictionary">The <see cref="CultureDictionary"/> that will contains all loaded translations.</param>
-        void LoadTranslations(CultureInfo cultureName, CultureDictionary dictionary);
+        void LoadTranslations(string languageTag, CultureDictionary dictionary);
     }
 }

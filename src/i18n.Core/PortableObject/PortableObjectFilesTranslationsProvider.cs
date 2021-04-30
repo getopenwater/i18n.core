@@ -26,18 +26,15 @@ namespace i18n.Core.PortableObject
         }
 
         /// <inheritdocs />
-        public void LoadTranslations([JetBrains.Annotations.NotNull] CultureInfo cultureInfo, [JetBrains.Annotations.NotNull] CultureDictionary dictionary)
+        public void LoadTranslations([JetBrains.Annotations.NotNull] string languageTag, [JetBrains.Annotations.NotNull] CultureDictionary dictionary)
         {
-            if (cultureInfo == null)
-                throw new ArgumentNullException(nameof(cultureInfo));
+            if (languageTag == null)
+                throw new ArgumentNullException(nameof(languageTag));
 
             if (dictionary == null)
                 throw new ArgumentNullException(nameof(dictionary));
 
-            if (cultureInfo.Name == "en")
-                return;
-
-            foreach (var poFileStream in _poFilesProvider.LoadFiles(cultureInfo.Name))
+            foreach (var poFileStream in _poFilesProvider.LoadFiles(languageTag))
             {
                 using (poFileStream)
                 {

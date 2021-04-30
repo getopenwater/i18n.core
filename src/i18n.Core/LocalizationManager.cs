@@ -42,9 +42,9 @@ namespace i18n.Core
         }
 
         /// <inheritdocs />
-        public CultureDictionary GetDictionary(CultureInfo culture, bool disableCache = false)
+        public CultureDictionary GetDictionary(string languageTag, bool disableCache = false)
         {
-            var cacheKeyPrefix = CacheKeyPrefix + culture.Name;
+            var cacheKeyPrefix = CacheKeyPrefix + languageTag;
 
             if (disableCache)
             {
@@ -53,18 +53,10 @@ namespace i18n.Core
 
             var cachedDictionary = _cache.GetOrCreate(cacheKeyPrefix, k => new Lazy<CultureDictionary>(() =>
             {
-                var rule = DefaultPluralRule;
+                var dictionary = new CultureDictionary(languageTag, DefaultPluralRule);
 
-                foreach (var provider in _pluralRuleProviders)
-                {
-                    if (provider.TryGetRule(culture, out rule))
-                    {
-                        break;
-                    }
-                }
-
-                var dictionary = new CultureDictionary(culture.Name, rule ?? DefaultPluralRule);
-                _translationProvider.LoadTranslations(culture, dictionary);
+                if (languageTag != "en")
+                    _translationProvider.LoadTranslations(languageTag, dictionary);
 
                 return dictionary;
             }, LazyThreadSafetyMode.ExecutionAndPublication));
@@ -73,10 +65,9 @@ namespace i18n.Core
         }
 
         /// <inheritdocs />
-        public string Translate(CultureInfo culture, string text)
+        public string Translate(string languageTag, string text)
         {
-            var cultureDictionary = GetDictionary(culture);
-            return _nuggetReplacer.Replace(cultureDictionary, text);
+            return _nuggetReplacer.Replace(GetDictionary(languageTag), text);
         }
     }
 }
