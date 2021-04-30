@@ -41,12 +41,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ITranslationProvider, PortableObjectFilesTranslationsProvider>();
             services.AddSingleton<ILocalizationFilesProvider, PortableObjectFilesProvider>();
             services.AddSingleton<ILocalizationManager, LocalizationManager>();
-            services.AddSingleton<IStringLocalizerFactory, PortableObjectStringLocalizerFactory>();
-            services.AddSingleton<IHtmlLocalizerFactory, PortableObjectHtmlLocalizerFactory>();
             services.AddSingleton<ISettingsProvider>(x => new SettingsProvider(hostEnvironment.ContentRootPath));
             services.AddSingleton<IPooledStreamManager>(defaultPooledStreamManager);
-
-            services.TryAddTransient(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
 
             if (requestLocalizationSetupAction != null)
             {
