@@ -37,7 +37,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ITranslationProvider, PortableObjectFilesTranslationsProvider>();
             services.AddSingleton<ILocalizationFilesProvider, PortableObjectFilesProvider>();
             services.AddSingleton<ILocalizationManager, LocalizationManager>();
-            services.AddSingleton<ISettingsProvider>(x => new SettingsProvider(hostEnvironment.ContentRootPath));
+
+            var settingsProvider = new SettingsProvider(hostEnvironment.ContentRootPath);
+            settingsProvider.PopulateFromWebConfig("Web.config");
+            services.AddSingleton<ISettingsProvider>(settingsProvider);
+
             services.AddSingleton<IPooledStreamManager>(defaultPooledStreamManager);
 
             if (requestLocalizationSetupAction != null)

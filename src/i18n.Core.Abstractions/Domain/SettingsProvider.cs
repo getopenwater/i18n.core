@@ -47,21 +47,22 @@ namespace i18n.Core.Abstractions.Domain
             var xmlDocument = new XmlDocument();
             xmlDocument.Load(xmlReader);
 
+            var appSettingsNode = xmlDocument.SelectSingleNode("/configuration/appSettings");
+            if (appSettingsNode == null)
+                return new Dictionary<string, string>();
+
             var appSettingsDict = new Dictionary<string, string>();
-            foreach (XmlNode node in xmlDocument.SelectSingleNode("/configuration/appSettings").ChildNodes)
+            foreach (XmlNode node in appSettingsNode.ChildNodes)
+
             {
                 if (node.Name != "add")
-                {
                     continue;
-                }
 
-                var key = node.Attributes["key"].Value;
+                var key = node.Attributes?["key"]?.Value;
                 if (key == null || !key.StartsWith("i18n."))
-                {
                     continue;
-                }
 
-                var value = node.Attributes["value"].Value;
+                var value = node.Attributes?["value"]?.Value;
                 appSettingsDict.Add(key, value);
             }
 
