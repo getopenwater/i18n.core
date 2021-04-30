@@ -104,7 +104,20 @@ namespace i18n.Core.Abstractions.Domain
             return paths;
         }
 
-        const string _localeDirectoryDefault = "locale";
+        const string _commonLocaleResourceDefault = "./bin/Debug/net5.0/AwardsCms.Web.Common.Core.dll";
+
+        public string CommonLocaleResource
+        {
+            get
+            {
+                var path = _settingsProvider.GetSetting(GetPrefixedString("CommonLocaleResource")) ?? _commonLocaleResourceDefault;
+
+                return BuildAbsolutePathFromProjectDirectory(path);
+            }
+            set => _settingsProvider.SetSetting(GetPrefixedString("CommonLocaleResource"), value);
+        }
+
+        const string _localeDirectoryDefault = "Locale";
 
         public string LocaleDirectory
         {

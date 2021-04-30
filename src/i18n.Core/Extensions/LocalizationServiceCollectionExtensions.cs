@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<INuggetReplacer, DefaultNuggetReplacer>();
             services.AddSingleton<IPluralRuleProvider, DefaultPluralRuleProvider>();
             services.AddSingleton<ITranslationProvider, PortableObjectFilesTranslationsProvider>();
-            services.AddSingleton<ILocalizationFileLocationProvider, ContentRootPoFileLocationProvider>();
+            services.AddSingleton<ILocalizationFilesProvider, PortableObjectFilesProvider>();
             services.AddSingleton<ILocalizationManager, LocalizationManager>();
             services.AddSingleton<IStringLocalizerFactory, PortableObjectStringLocalizerFactory>();
             services.AddSingleton<IHtmlLocalizerFactory, PortableObjectHtmlLocalizerFactory>();

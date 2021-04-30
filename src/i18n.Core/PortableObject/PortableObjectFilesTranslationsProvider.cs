@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using i18n.Core.Abstractions;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
 
 namespace i18n.Core.PortableObject
 {
@@ -15,47 +12,39 @@ namespace i18n.Core.PortableObject
     /// </summary>
     public class PortableObjectFilesTranslationsProvider : ITranslationProvider
     {
-        readonly ILocalizationFileLocationProvider _poFilesLocationProvider;
-        [MaybeNull] readonly ILogger<PortableObjectFilesTranslationsProvider> _logger;
+        readonly ILocalizationFilesProvider _poFilesProvider;
         readonly PortableObjectParser _parser;
 
         /// <summary>
         /// Creates a new instance of <see cref="PortableObjectFilesTranslationsProvider"/>.
         /// </summary>
-        /// <param name="poFileLocationProvider">The <see cref="ILocalizationFileLocationProvider"/>.</param>
-        /// <param name="logger"></param>
-        public PortableObjectFilesTranslationsProvider(ILocalizationFileLocationProvider poFileLocationProvider, ILogger<PortableObjectFilesTranslationsProvider> logger = null)
+        /// <param name="poFilesProvider">The <see cref="ILocalizationFilesProvider"/>.</param>
+        public PortableObjectFilesTranslationsProvider(ILocalizationFilesProvider poFilesProvider)
         {
-            _poFilesLocationProvider = poFileLocationProvider;
-            _logger = logger;
+            _poFilesProvider = poFilesProvider;
             _parser = new PortableObjectParser();
         }
 
         /// <inheritdocs />
         public void LoadTranslations([JetBrains.Annotations.NotNull] CultureInfo cultureInfo, [JetBrains.Annotations.NotNull] CultureDictionary dictionary)
         {
-            if (cultureInfo == null) throw new ArgumentNullException(nameof(cultureInfo));
-            if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
+            if (cultureInfo == null)
+                throw new ArgumentNullException(nameof(cultureInfo));
 
-            var fileInfos = new List<IFileInfo>();
-            var cultureName = cultureInfo.Name;
-            fileInfos.AddRange(_poFilesLocationProvider.GetLocations(cultureName));
+            if (dictionary == null)
+                throw new ArgumentNullException(nameof(dictionary));
 
-            foreach (var fileInfo in fileInfos.Where(fileInfo => !fileInfo.IsDirectory))
+            if (cultureInfo.Name == "en")
+                return;
+
+            foreach (var poFileStream in _poFilesProvider.LoadFiles(cultureInfo.Name))
             {
-                if (fileInfo.Exists)
+                using (poFileStream)
                 {
-                    using var stream = fileInfo.CreateReadStream();
-                    using var reader = new StreamReader(stream);
+                    using var reader = new StreamReader(poFileStream);
                     dictionary.MergeTranslations(_parser.Parse(reader));
-
-                    _logger?.LogDebug($"Translations for culture found: {cultureName}. Translations available: {dictionary.Translations.Count}. Path: {fileInfo.PhysicalPath}.");
-                    break;
                 }
-
-                _logger?.LogWarning($"Translation for culture was not found: {cultureName}. Path: {fileInfo.PhysicalPath}.");
             }
         }
-
     }
 }
