@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using i18n.Core.Abstractions;
@@ -114,13 +115,23 @@ namespace i18n.Core.Middleware
             var responseBodyPooledStream = new DisposablePooledStream(_pooledStreamManager, nameof(I18NMiddleware));
             context.Response.RegisterForDisposeAsync(responseBodyPooledStream);
 
-            var httpResponseBodyFeature = context.Features.Get<IHttpResponseBodyFeature>();
+            var originalHttpResponseBodyFeature = context.Features.Get<IHttpResponseBodyFeature>();
             var httpResponseFeature = context.Features.Get<IHttpResponseFeature>();
 
             var streamResponseBodyFeature = new StreamResponseBodyFeature(responseBodyPooledStream);
             context.Features.Set<IHttpResponseBodyFeature>(streamResponseBodyFeature);
 
-            await _next(context).ConfigureAwait(false);
+            ExceptionDispatchInfo edi = null;
+            try
+            {
+                await _next(context).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                edi = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            context.Features.Set<IHttpResponseBodyFeature>(originalHttpResponseBodyFeature);
 
             // Force dynamic content type in order reset Content-Length header.
             httpResponseFeature.Headers.ContentLength = null;
@@ -136,8 +147,7 @@ namespace i18n.Core.Middleware
                 var requestCultureInfo = GetRequestCultureInfo(context);
                 var cultureDictionary = _localizationManager.GetDictionary(requestCultureInfo, !_options.CacheEnabled);
 
-                _logger?.LogDebug(
-                    $"Request path: {context.Request.Path}. Culture name: {cultureDictionary.CultureName}. Translations: {cultureDictionary.Translations.Count}.");
+                _logger?.LogDebug($"Request path: {context.Request.Path}. Culture name: {cultureDictionary.CultureName}. Translations: {cultureDictionary.Translations.Count}.");
 
                 var responseBody = await ReadResponseBodyAsStringAsync(httpResponseBodyStream, requestEncoding);
                 
@@ -159,12 +169,15 @@ namespace i18n.Core.Middleware
                 }
 
                 var stringContent = new StringContent(responseBodyTranslated, requestEncoding, contentType);
-                await stringContent.CopyToAsync(httpResponseBodyFeature.Stream, cancellationToken);
+                await stringContent.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken);
 
                 return;
             }
 
-            await httpResponseBodyStream.CopyToAsync(httpResponseBodyFeature.Stream, cancellationToken).ConfigureAwait(false);
+            await httpResponseBodyStream.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken).ConfigureAwait(false);
+
+            if (edi != null)
+                edi.Throw();
         }
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
