@@ -3,17 +3,17 @@ using System;
 namespace i18n.Core.Abstractions
 {
     /// <summary>
-    /// Represents a record in a <see cref="CultureDictionary"/>.
+    /// Represents a record in a <see cref="TranslationDictionary"/>.
     /// </summary>
-    public class CultureDictionaryRecord
+    public class TranslationDictionaryRecord
     {
         /// <summary>
-        /// Creates new instance of <see cref="CultureDictionaryRecord"/>.
+        /// Creates new instance of <see cref="TranslationDictionaryRecord"/>.
         /// </summary>
         /// <param name="messageId">The message Id.</param>
         /// <param name="context">The message context.</param>
         /// <param name="translations">a list of translations</param>
-        public CultureDictionaryRecord(string messageId, string context, string[] translations)
+        public TranslationDictionaryRecord(string messageId, string context, string[] translations)
         {
             Key = GetKey(messageId, context);
             Translations = translations;

@@ -26,7 +26,7 @@ namespace i18n.Core.PortableObject
         }
 
         /// <inheritdocs />
-        public void LoadTranslations([JetBrains.Annotations.NotNull] string languageTag, [JetBrains.Annotations.NotNull] CultureDictionary dictionary)
+        public void LoadTranslations([JetBrains.Annotations.NotNull] string languageTag, [JetBrains.Annotations.NotNull] TranslationDictionary dictionary)
         {
             if (languageTag == null)
                 throw new ArgumentNullException(nameof(languageTag));

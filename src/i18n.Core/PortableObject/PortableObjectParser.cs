@@ -24,7 +24,7 @@ namespace i18n.Core.PortableObject
         /// </summary>
         /// <param name="reader">The <see cref="TextReader"/>.</param>
         /// <returns>A list of culture records.</returns>
-        public IEnumerable<CultureDictionaryRecord> Parse(TextReader reader)
+        public IEnumerable<TranslationDictionaryRecord> Parse(TextReader reader)
         {
             var entryBuilder = new DictionaryRecordBuilder();
             string line;
@@ -183,14 +183,14 @@ namespace i18n.Core.PortableObject
                 }
             }
 
-            public CultureDictionaryRecord BuildRecordAndReset()
+            public TranslationDictionaryRecord BuildRecordAndReset()
             {
                 if (!IsValid)
                 {
                     return null;
                 }
 
-                var result = new CultureDictionaryRecord(MessageId, MessageContext, ValidValues.ToArray());
+                var result = new TranslationDictionaryRecord(MessageId, MessageContext, ValidValues.ToArray());
 
                 MessageId = null;
                 MessageContext = null;

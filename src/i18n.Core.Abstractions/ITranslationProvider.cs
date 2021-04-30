@@ -11,7 +11,7 @@ namespace i18n.Core.Abstractions
         /// Loads translations from a certain source for a specific language tag.
         /// </summary>
         /// <param name="languageTag">The language tag.</param>
-        /// <param name="dictionary">The <see cref="CultureDictionary"/> that will contains all loaded translations.</param>
-        void LoadTranslations(string languageTag, CultureDictionary dictionary);
+        /// <param name="dictionary">The <see cref="TranslationDictionary"/> that will contains all loaded translations.</param>
+        void LoadTranslations(string languageTag, TranslationDictionary dictionary);
     }
 }

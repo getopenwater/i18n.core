@@ -12,8 +12,8 @@ namespace i18n.Core.Abstractions
         /// </summary>
         /// <param name="languageTag">The language tag.</param>
         /// <param name="disableCache"></param>
-        /// <returns>A <see cref="CultureDictionary"/> for the specified language tag.</returns>
-        CultureDictionary GetDictionary(string languageTag, bool disableCache = false);
+        /// <returns>A <see cref="TranslationDictionary"/> for the specified language tag.</returns>
+        TranslationDictionary GetDictionary(string languageTag, bool disableCache = false);
 
         /// <summary>
         /// Translates text to a given language tag.

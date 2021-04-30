@@ -13,7 +13,7 @@ namespace i18n.Core
     /// </summary>
     public class LocalizationManager : ILocalizationManager
     {
-        const string CacheKeyPrefix = "CultureDictionary-";
+        const string CacheKeyPrefix = "TranslationDictionary-";
 
         static readonly PluralizationRuleDelegate DefaultPluralRule = n => n != 1 ? 1 : 0;
 
@@ -42,7 +42,7 @@ namespace i18n.Core
         }
 
         /// <inheritdocs />
-        public CultureDictionary GetDictionary(string languageTag, bool disableCache = false)
+        public TranslationDictionary GetDictionary(string languageTag, bool disableCache = false)
         {
             var cacheKeyPrefix = CacheKeyPrefix + languageTag;
 
@@ -51,9 +51,9 @@ namespace i18n.Core
                 _cache.Remove(cacheKeyPrefix);
             }
 
-            var cachedDictionary = _cache.GetOrCreate(cacheKeyPrefix, k => new Lazy<CultureDictionary>(() =>
+            var cachedDictionary = _cache.GetOrCreate(cacheKeyPrefix, k => new Lazy<TranslationDictionary>(() =>
             {
-                var dictionary = new CultureDictionary(languageTag, DefaultPluralRule);
+                var dictionary = new TranslationDictionary(languageTag, DefaultPluralRule);
 
                 if (languageTag != "en")
                     _translationProvider.LoadTranslations(languageTag, dictionary);

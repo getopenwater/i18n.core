@@ -8,7 +8,7 @@ namespace i18n.Core
 {
     public interface INuggetReplacer
     {
-        string Replace([NotNull] CultureDictionary cultureDictionary, string text);
+        string Replace([NotNull] TranslationDictionary translationDictionary, string text);
     }
 
     public class DefaultNuggetReplacer : INuggetReplacer
@@ -35,16 +35,16 @@ namespace i18n.Core
                     RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.Compiled);
         }
 
-        public string Replace(CultureDictionary cultureDictionary, string text)
+        public string Replace(TranslationDictionary translationDictionary, string text)
         {
-            if (cultureDictionary == null)
-                throw new ArgumentNullException(nameof(cultureDictionary));
+            if (translationDictionary == null)
+                throw new ArgumentNullException(nameof(translationDictionary));
 
             return NuggetRegex.Replace(text, match =>
             {
                 var messageId = match.Groups[1].Value;
                 var context = match.Groups[3].Value;
-                var translatedText = cultureDictionary[messageId, context] ?? messageId;
+                var translatedText = translationDictionary[messageId, context] ?? messageId;
 
                 var formatItemCaptures = match.Groups[2].Captures;
                 for (var i = 0; i < formatItemCaptures.Count; i++)

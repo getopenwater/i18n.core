@@ -145,9 +145,9 @@ namespace i18n.Core.Middleware
                 var languageTag = context.Request.Cookies["i18n.langtag"];
                 languageTag = !string.IsNullOrEmpty(languageTag) ? languageTag : "en";
 
-                var cultureDictionary = _localizationManager.GetDictionary(languageTag, !_options.CacheEnabled);
+                var translationDictionary = _localizationManager.GetDictionary(languageTag, !_options.CacheEnabled);
 
-                _logger?.LogDebug($"Request path: {context.Request.Path}. Culture name: {cultureDictionary.CultureName}. Translations: {cultureDictionary.Translations.Count}.");
+                _logger?.LogDebug($"Request path: {context.Request.Path}. Language tag: {translationDictionary.LanguageTag}. Translations: {translationDictionary.Translations.Count}.");
 
                 var responseBody = await ReadResponseBodyAsStringAsync(httpResponseBodyStream, requestEncoding);
                 
@@ -156,7 +156,7 @@ namespace i18n.Core.Middleware
                 {
                     var sw = new Stopwatch();
                     sw.Restart();
-                    responseBodyTranslated = _nuggetReplacer.Replace(cultureDictionary, responseBody);
+                    responseBodyTranslated = _nuggetReplacer.Replace(translationDictionary, responseBody);
                     sw.Stop();
 
                     _logger?.LogDebug($"Replaced body in {sw.ElapsedMilliseconds} ms.");
@@ -165,7 +165,7 @@ namespace i18n.Core.Middleware
                 }
                 else
                 {
-                    responseBodyTranslated = _nuggetReplacer.Replace(cultureDictionary, responseBody);
+                    responseBodyTranslated = _nuggetReplacer.Replace(translationDictionary, responseBody);
                 }
 
                 var stringContent = new StringContent(responseBodyTranslated, requestEncoding, contentType);
