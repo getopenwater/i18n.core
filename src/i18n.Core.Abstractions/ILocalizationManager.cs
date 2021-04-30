@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace i18n.Core.Abstractions
 {
     /// <summary>

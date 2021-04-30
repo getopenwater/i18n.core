@@ -6,10 +6,7 @@ using i18n.Core.Abstractions.Domain;
 using i18n.Core.Middleware;
 using i18n.Core.PortableObject;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.Localization;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
