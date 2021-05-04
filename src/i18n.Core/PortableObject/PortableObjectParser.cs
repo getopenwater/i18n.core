@@ -38,7 +38,7 @@ namespace i18n.Core.PortableObject
                 }
 
                 // msgid or msgctxt are first lines of the entry. If builder contains valid entry return it and start building a new one.
-                if ((context == PoContext.MessageId 
+                if ((context == PoContext.MessageId
                      || context == PoContext.MessageContext) && entryBuilder.ShouldFlushRecord)
                 {
                     yield return entryBuilder.BuildRecordAndReset();
@@ -135,7 +135,7 @@ namespace i18n.Core.PortableObject
 
             public bool IsValid => !string.IsNullOrEmpty(MessageId) && !string.IsNullOrEmpty(Value);
             public bool ShouldFlushRecord => IsValid && _context == PoContext.Translation;
-            
+
             public void Set(PoContext context, string text)
             {
                 switch (context)
