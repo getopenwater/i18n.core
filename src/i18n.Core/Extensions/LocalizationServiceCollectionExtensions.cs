@@ -37,12 +37,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ITranslationProvider, PortableObjectFilesTranslationsProvider>();
             services.AddSingleton<ILocalizationFilesProvider, PortableObjectFilesProvider>();
             services.AddSingleton<ILocalizationManager, LocalizationManager>();
-
-            var settingsProvider = new SettingsProvider(hostEnvironment.ContentRootPath);
-            settingsProvider.PopulateFromWebConfig("Web.config");
-            services.AddSingleton<ISettingsProvider>(settingsProvider);
-
             services.AddSingleton<IPooledStreamManager>(defaultPooledStreamManager);
+
+            services.AddOptions<I18NLocalizationOptions>().BindConfiguration(nameof(I18NLocalizationOptions));
 
             if (requestLocalizationSetupAction != null)
             {
@@ -64,9 +61,6 @@ namespace Microsoft.Extensions.DependencyInjection
                     CacheEnabled = !hostEnvironment.IsDevelopment()
                 });
             }
-
-            services.AddSingleton(x =>
-                Options.Options.Create(new I18NLocalizationOptions(x.GetRequiredService<ISettingsProvider>())));
 
             return services;
         }
