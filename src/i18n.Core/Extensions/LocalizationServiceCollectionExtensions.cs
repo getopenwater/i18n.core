@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using i18n.Core;
 using i18n.Core.Abstractions;
-using i18n.Core.Abstractions.Domain;
 using i18n.Core.Middleware;
 using i18n.Core.PortableObject;
 using Microsoft.AspNetCore.Builder;
@@ -42,8 +41,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 middlewareOptionsSetupAction?.Invoke(x);
             });
-
-            services.AddOptions<I18NLocalizationOptions>().BindConfiguration(nameof(I18NLocalizationOptions));
 
             return services;
         }
