@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -124,17 +123,14 @@ namespace i18n.Core.Middleware
             var streamResponseBodyFeature = new StreamResponseBodyFeature(responseBodyPooledStream);
             context.Features.Set<IHttpResponseBodyFeature>(streamResponseBodyFeature);
 
-            ExceptionDispatchInfo edi = null;
             try
             {
                 await _next(context).ConfigureAwait(false);
             }
-            catch (Exception ex)
+            finally
             {
-                edi = ExceptionDispatchInfo.Capture(ex);
+                context.Features.Set<IHttpResponseBodyFeature>(originalHttpResponseBodyFeature);
             }
-
-            context.Features.Set<IHttpResponseBodyFeature>(originalHttpResponseBodyFeature);
 
             // Force dynamic content type in order reset Content-Length header.
             httpResponseFeature.Headers.ContentLength = null;
@@ -181,9 +177,6 @@ namespace i18n.Core.Middleware
             }
 
             await httpResponseBodyStream.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken).ConfigureAwait(false);
-
-            if (edi != null)
-                edi.Throw();
         }
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
