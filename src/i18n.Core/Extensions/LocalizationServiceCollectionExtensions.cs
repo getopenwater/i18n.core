@@ -4,7 +4,6 @@ using i18n.Core;
 using i18n.Core.Abstractions;
 using i18n.Core.Middleware;
 using i18n.Core.PortableObject;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 
 // ReSharper disable once CheckNamespace
@@ -31,7 +30,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<INuggetReplacer, DefaultNuggetReplacer>();
             services.AddSingleton<ITranslationProvider, PortableObjectFilesTranslationsProvider>();
-            services.AddSingleton<ILocalizationFilesProvider, PortableObjectFilesProvider>();
             services.AddSingleton<ILocalizationManager, LocalizationManager>();
             services.AddSingleton<IPooledStreamManager>(new DefaultPooledStreamManager());
 

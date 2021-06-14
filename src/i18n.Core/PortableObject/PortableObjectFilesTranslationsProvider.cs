@@ -33,13 +33,11 @@ namespace i18n.Core.PortableObject
             if (dictionary == null)
                 throw new ArgumentNullException(nameof(dictionary));
 
-            foreach (var poFileStream in _poFilesProvider.LoadFiles(languageTag))
+            foreach (var fileInfo in _poFilesProvider.LoadFiles(languageTag))
             {
-                using (poFileStream)
-                {
-                    using var reader = new StreamReader(poFileStream);
-                    dictionary.MergeTranslations(_parser.Parse(reader));
-                }
+                using var poFileStream = fileInfo.CreateReadStream();
+                using var reader = new StreamReader(poFileStream);
+                dictionary.MergeTranslations(_parser.Parse(reader));
             }
         }
     }

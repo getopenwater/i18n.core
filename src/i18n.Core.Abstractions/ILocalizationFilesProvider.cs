@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace i18n.Core.Abstractions
 {
@@ -8,6 +8,6 @@ namespace i18n.Core.Abstractions
     /// </summary>
     public interface ILocalizationFilesProvider
     {
-        IEnumerable<Stream> LoadFiles(string languageTag);
+        IEnumerable<IFileInfo> LoadFiles(string languageTag);
     }
 }
