@@ -28,6 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (hostEnvironment == null)
                 throw new ArgumentNullException(nameof(hostEnvironment));
 
+            services.AddMemoryCache();
             services.AddSingleton<INuggetReplacer, DefaultNuggetReplacer>();
             services.AddSingleton<ITranslationProvider, PortableObjectFilesTranslationsProvider>();
             services.AddSingleton<ILocalizationManager, LocalizationManager>();
