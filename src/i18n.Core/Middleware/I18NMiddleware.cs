@@ -136,6 +136,9 @@ namespace i18n.Core.Middleware
             httpResponseFeature.Headers.ContentLength = null;
 
             var httpResponseBodyStream = (Stream)responseBodyPooledStream;
+            if (httpResponseBodyStream.Length == 0)
+                return;
+
             httpResponseBodyStream.Seek(0, SeekOrigin.Begin);
 
             var contentType = GetRequestContentType(context);
