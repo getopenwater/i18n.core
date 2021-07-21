@@ -106,8 +106,8 @@ namespace i18n.Core.Middleware
             var cancellationToken = context.RequestAborted;
             var requestEncoding = _options.RequestEncoding ?? Encoding.UTF8;
             var excludeUrls = _options.ExcludeUrls;
-            var modifyResponse = excludeUrls == null || !excludeUrls.Any(bl => context.Request.Path.Value != null
-                                                                               && context.Request.Path.Value.ToLowerInvariant().Contains(bl));
+            var modifyResponse = excludeUrls == null || !excludeUrls.Any(bl => context.Request.Path.Value != null && context.Request.Path.Value.ToLowerInvariant().Contains(bl));
+
             if (!modifyResponse)
             {
                 await _next(context);

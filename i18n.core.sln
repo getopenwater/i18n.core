@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "i18n.Core", "src\i18n.Core\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "i18n.Core.Abstractions", "src\i18n.Core.Abstractions\i18n.Core.Abstractions.csproj", "{134F882C-68C7-465F-A72D-67950E05DC69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Core.Web", "src\i18n.Core.Web\i18n.Core.Web.csproj", "{7740E05A-2739-4820-AFE8-B8019C73D5B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{134F882C-68C7-465F-A72D-67950E05DC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{134F882C-68C7-465F-A72D-67950E05DC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{134F882C-68C7-465F-A72D-67950E05DC69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7740E05A-2739-4820-AFE8-B8019C73D5B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7740E05A-2739-4820-AFE8-B8019C73D5B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7740E05A-2739-4820-AFE8-B8019C73D5B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7740E05A-2739-4820-AFE8-B8019C73D5B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

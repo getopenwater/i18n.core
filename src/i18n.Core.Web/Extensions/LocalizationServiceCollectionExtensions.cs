@@ -1,8 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using i18n.Core;
-using i18n.Core.Abstractions;
-using i18n.Core.PortableObject;
+using i18n.Core.Middleware;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -17,15 +15,19 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Registers the services to enable localization using Portable Object files.
         /// </summary>
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-        public static IServiceCollection AddI18NLocalizationCore([JetBrains.Annotations.NotNull] this IServiceCollection services)
+        public static IServiceCollection AddI18NLocalization([JetBrains.Annotations.NotNull] this IServiceCollection services,
+            Action<I18NMiddlewareOptions> middlewareOptionsSetupAction = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            services.AddMemoryCache();
-            services.AddSingleton<INuggetReplacer, DefaultNuggetReplacer>();
-            services.AddSingleton<ITranslationProvider, PortableObjectFilesTranslationsProvider>();
-            services.AddSingleton<ILocalizationManager, LocalizationManager>();
+            services.AddI18NLocalizationCore();
+            services.AddSingleton<IPooledStreamManager>(new DefaultPooledStreamManager());
+
+            services.Configure<I18NMiddlewareOptions>(x =>
+            {
+                middlewareOptionsSetupAction?.Invoke(x);
+            });
 
             return services;
         }
