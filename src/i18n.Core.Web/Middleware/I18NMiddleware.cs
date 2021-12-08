@@ -50,6 +50,7 @@ namespace i18n.Core.Middleware
         public bool CacheEnabled { get; [UsedImplicitly] set; }
         public Encoding RequestEncoding { get; [UsedImplicitly] set; }
         public string LanguageTagCookieName { get; set; }
+        public string I18NLanguageKey { get; set; }
 
         public I18NMiddlewareOptions()
         {
@@ -71,6 +72,7 @@ namespace i18n.Core.Middleware
 
             RequestEncoding = Encoding.UTF8;
             LanguageTagCookieName = "i18n.langtag";
+            I18NLanguageKey = "i18n.UserLanguage";
         }
     }
 
@@ -146,7 +148,7 @@ namespace i18n.Core.Middleware
             var replaceNuggets = validContentTypes != null && validContentTypes.Contains(contentType);
             if (replaceNuggets)
             {
-                var languageTag = context.Request.Cookies[_options.LanguageTagCookieName];
+                var languageTag = context.Items[_options.I18NLanguageKey]?.ToString() ?? context.Request.Cookies[_options.LanguageTagCookieName];
                 if (languageTag == null || !LanguageTagPattern.IsMatch(languageTag))
                     languageTag = "en";
 
