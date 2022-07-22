@@ -175,8 +175,11 @@ namespace i18n.Core.Middleware
                     responseBodyTranslated = _nuggetReplacer.Replace(translationDictionary, responseBody);
                 }
 
-                var stringContent = new StringContent(responseBodyTranslated, requestEncoding, contentType);
-                await stringContent.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken);
+                if (!context.RequestAborted.IsCancellationRequested)
+                {
+                    var stringContent = new StringContent(responseBodyTranslated, requestEncoding, contentType);
+                    await stringContent.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken);
+                }
 
                 return;
             }
