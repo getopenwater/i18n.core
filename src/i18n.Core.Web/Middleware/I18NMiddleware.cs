@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -13,6 +12,8 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -175,16 +176,17 @@ namespace i18n.Core.Middleware
                     responseBodyTranslated = _nuggetReplacer.Replace(translationDictionary, responseBody);
                 }
 
-                if (!context.RequestAborted.IsCancellationRequested)
+                await RunSafely(async () =>
                 {
-                    var stringContent = new StringContent(responseBodyTranslated, requestEncoding, contentType);
-                    await stringContent.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken);
-                }
+                    var writer = context.RequestServices.GetRequiredService<IHttpResponseStreamWriterFactory>().CreateWriter(originalHttpResponseBodyFeature.Stream, requestEncoding);
+                    await writer.WriteAsync(responseBodyTranslated.AsMemory(), cancellationToken);
+                    await writer.FlushAsync();
+                });
 
                 return;
             }
 
-            await httpResponseBodyStream.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken).ConfigureAwait(false);
+            await RunSafely(() => httpResponseBodyStream.CopyToAsync(originalHttpResponseBodyFeature.Stream, cancellationToken));
         }
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
@@ -197,6 +199,18 @@ namespace i18n.Core.Middleware
         {
             using var streamReader = new StreamReader(stream, encoding, false);
             return await streamReader.ReadToEndAsync().ConfigureAwait(false);
+        }
+
+        private static async Task RunSafely(Func<Task> action)
+        {
+            try
+            {
+                await action().ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // client is disconnected
+            }
         }
 
         readonly struct DisposablePooledStream : IAsyncDisposable
